@@ -1,0 +1,146 @@
+#! /bin/bash
+
+# This is a diagnostics script that for now provides some basic information
+# about the machine that it is used on. It supports a limited number of OSes
+# intentionally.
+
+## Colours used:
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+L_BLUE="\e[94m"
+ENDCOLOR="\e[0m"
+
+# Checks if the os-release file is found on the machine:
+if [[ -f /etc/os-release ]];
+then
+        :
+else
+        echo "Could not identify OS, this script does not support this OS. Exiting."
+        exit;
+fi
+
+# Retrieves some basic information about the OS and kernel:
+os_info=("$(grep '^NAME=\|^VERSION=' '/etc/os-release' | cut -d '=' -f 2 | tr -d '"' )" "$(uname -r)")
+os_name=${os_info[0]/$'\n'/" "}
+
+# If the OS information was not properly retrieved below code will exit script:
+if [[ -n $os_name ]];
+then
+        :
+else
+        echo "Could not identify OS, this script does not support this OS. Exiting."
+        exit;
+fi
+
+# Show welcome message and output basic OS info:
+echo -e "${YELLOW}Welcome to the script!${ENDCOLOR}
+
+Current OS is: $os_name
+Kernel version is: ${os_info[-1]}"
+
+## Perform OS compatibility check with approved OSes:
+# Compatible OSes array
+supported_oses=("CloudLinux 8" "Fedora Linux 38" "CentOS Linux 7" "AlmaLinux 8")
+
+# The actual code that checks the compatibility:
+if [[ "${supported_oses[*]}" =~ ${os_name/ (*} ]] || [[ "${supported_oses[*]}" =~ ${os_name/.? (*} ]]
+then
+        printf "%s\n${GREEN}The OS is supported by the script, continuing.${ENDCOLOR}\n"
+else
+        echo "Bye"
+        read -rp "The script does not support the current OS, please confirm with yes/y if you'd like to continue: " user_input
+        if [[ "$user_input" == "yes" || "$user_input" == "y" ]]
+        then
+                echo "Proceeding at user's own risk."
+        else
+                echo "Good bye."
+                exit;
+        fi
+fi
+
+# The array that holds the binaries that are used by the script:
+binary_array=("df" "du" "sar" "nproc" "awk" "systemctl")
+
+# Loop through each binary and check if present:
+printf "\nEach binary dependancy of this script will be checked below:\n"
+for binary in "${binary_array[@]}"
+do
+	which "$binary" >/dev/null 2>&1 || { echo -e "${RED}Vital binary not found - $binary - Exiting.${ENDCOLOR}" >&2; exit 1; }
+	echo -e "${GREEN}$binary found!${ENDCOLOR}"
+done
+
+## Retrieve Basic diagnostic information about the machine:
+# Set some variables beforehand:
+num_cores=$(nproc --all)
+
+# Retrieve disk space info:
+echo -e "
+${YELLOW}----- STARTING DIAGNOSTICS -----${ENDCOLOR}
+${YELLOW}--- DISK RELATED ---${ENDCOLOR}
+- Disk Usage info:
+$(df -h / /tmp)
+
+- INODES info:
+$(df -ih / /tmp)
+
+${YELLOW}--- MEMORY RELATED ---${ENDCOLOR}
+${L_BLUE}- If there are OOM-related kernel messages, they will appear below (latest 10 shown, there could be more):${ENDCOLOR}
+$(grep 'Out of' /var/log/messages* | tail -10)
+
+${YELLOW}--- CPU RELATED ---${ENDCOLOR}
+${L_BLUE}- Sar output filtered to show if 1min CPU load was higher than number of cores (there could be none):${ENDCOLOR}
+incident time  runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked
+$(sar -q | awk -v num_cores="$num_cores" '{if($5>num_cores)print}' | grep -v "ldavg\|blocked\|${os_info[1]}")
+
+- Sar output the last five entries of CPU usage in any case:
+$(sar -q | tail -5)
+"
+echo -e "${YELLOW}--- DETECTED INSTALLED SERVICES ---${ENDCOLOR}"
+services_to_check=("httpd" "lsws" "nginx" "mariadb" "mysqld" "postgresql" "nightwatchd" "jetmongod" "csf" "cphulkd" "imunify360" "redis" "memcached" "supervisord" "munin" "elasticsearch")
+
+# The below loop will check each service if the same is active:
+for chk_serv in "${services_to_check[@]}"
+do
+        # If MariaDB is found previously, MySQL will be skipped:
+        if [[ $mariadb_status == "0" ]] && [[ "$chk_serv" == "mysqld" ]]
+        then
+                continue
+        fi
+        
+        # If MariaDB is present, save it in a variable:
+        if [[ "$chk_serv" == "mariadb" ]]
+        then
+                systemctl is-active --quiet "$chk_serv"
+                mariadb_status="$?"
+        fi
+        
+        # Perform the actual service checks and return output:
+        systemctl is-active --quiet "$chk_serv"
+        case $? in
+                # If the Exit code from is-active is 0, report as active and 
+                # add to "working services"
+                0) echo -e "${GREEN}$chk_serv - is running.${ENDCOLOR}" 
+                working_services+=("$chk_serv") ;;
+                
+                # If exit status is 1, 2 or 3 report as missing/inactive/failed
+                1|2|3|4) if systemctl is-enabled "$chk_serv" 2>/dev/null 1>&2
+                then
+                        echo -e "${RED}$chk_serv - is inactive/failed.${ENDCOLOR}"
+                else
+                        echo -e "${YELLOW}$chk_serv - no such service.${ENDCOLOR}"
+                fi ;;
+        esac
+done
+
+# Set DIR variable to improve sourced .sh files executing from other dirs:
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+# Perform specific actions relating to each active service found:
+for active_service in "${working_services[@]}"
+do
+        case "$active_service" in
+                "httpd"|"lsws") . "$DIR/source/ws/httpd-ws.sh" ;;
+        esac
+done
