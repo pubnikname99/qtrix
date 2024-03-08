@@ -141,6 +141,24 @@ if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 for active_service in "${working_services[@]}"
 do
         case "$active_service" in
-                "httpd"|"lsws") . "$DIR/source/ws/httpd-ws.sh" ;;
+                "httpd") . "$DIR/source/ws/httpd-ws.sh" ;;
         esac
 done
+
+keep_loop=true
+until [[ $keep_loop == false ]]
+do
+        # Select from a list of actions if you want to perform a specific task:
+        read -rp "\nYou can perform specific actions here after reviewing the output above. Please select from the following (type the number at the start of the option):
+1) Disk space breakdown -- TEMPLATE
+2) Exit
+" user_input
+        
+        # Perform the action selected above:
+        case "$active_service" in
+                1) . "$DIR/source/disk/disk.sh" && keep_loop=false ;;
+                2) exit ;;
+                *) echo "Invalid input. Please try again."
+        esac
+done
+
