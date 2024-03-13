@@ -18,5 +18,5 @@ else
 fi
 
 # Execute python script and pass along the info as variables:
-python "$DIR/source/disk/disk.py" "${df_info[*]}" "${df_info[8]}" "$root_dirs" "$backup_dirs" "$large_files_found" "$jb_status" "$admin_name"
+python3 "$DIR/source/disk/disk.py" "${df_info[*]}" "${df_info[8]}" "$root_dirs" "$backup_dirs" "$large_files_found" "$jb_status" "$admin_name"
 
