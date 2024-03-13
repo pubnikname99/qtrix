@@ -162,7 +162,7 @@ Your choice: " user_input
         esac
         # Perform the action selected above:
         case "$user_input" in
-                1) echo -e "\n${L_BLUE}Gathering info and creating template, please wait. . .${ENDCOLOR}\n"
+                1) echo -e "\n${L_BLUE}Gathering info and creating template, please wait . . .${ENDCOLOR}\n"
                 . "$DIR/source/disk/disk.sh" && keep_loop=false ;;
                 2) exit ;;
                 *) echo -e "\n${RED}Invalid input. Please try again.${ENDCOLOR}\n"
