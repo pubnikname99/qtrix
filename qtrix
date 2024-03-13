@@ -60,7 +60,7 @@ else
 fi
 
 # The array that holds the binaries that are used by the script:
-binary_array=("df" "du" "sar" "nproc" "awk" "systemctl" "wc" "sort" "uniq" "head" "tail" "find" "python")
+binary_array=("df" "du" "sar" "nproc" "awk" "systemctl" "wc" "sort" "uniq" "head" "tail" "find" "python3")
 
 # Loop through each binary and check if present:
 printf "\nEach binary dependancy of this script will be checked below:\n"
