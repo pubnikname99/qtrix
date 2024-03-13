@@ -8,6 +8,8 @@ Due to the way that incremental backups work, they're linked to each other and d
 
 The current backup configuration is as follows:
 
-SCREENSHOT_FOR_CPAN_BACKUPS
+[backup_conf]
 
-We can offer to reconfigure the backing up service to ONLY retain weekly OR daily backups and to reconfigure the retention to 1. We can also offer to reconfigure the backup types FROM incremental TO compressed.
+BACKUPACCTS and BACKUPSUSPENDEDACCTS indicate if the cPanel accounts (suspended or not) will be backed up. Daily/monthly/weekly backups "yes" indicate that they are enabled and "no" that they are disabled, the retention under each type indicates how many backups are kept of the named type.
+
+We can offer to reconfigure the backing up service to ONLY retain weekly, daily OR monthly backups and to reconfigure the retention to 1.

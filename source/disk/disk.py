@@ -9,10 +9,11 @@ df_info = argv[1].replace("Mounted on", "Mounted on\n") # df info
 df_only_total_size = argv[2] # Only server size from df
 df_only_total_size = int(df_only_total_size.replace('G', '')) # Remove G from server size
 root_dirs = argv[3] # Largest directories in /
-backup_dirs = argv[4] # All backup directories
-large_files_found = argv[5] # Largest files on the server
-jb_status = argv[6] # Detect if JB is present
-admin_name = argv[7] # The admin name that will appear in the ticket signature
+backup_conf = argv[4] # Retrieve backup configuration
+backup_dirs = argv[5] # All backup directories
+large_files_found = argv[6] # Largest files on the server
+jb_status = argv[7] # Detect if JB is present
+admin_name = argv[8] # The admin name that will appear in the ticket signature
 my_path = path.abspath(path.dirname(__file__))
 
 # Retrieve the mini templates:
@@ -43,6 +44,7 @@ with open(path.join(my_path, "templates/template.txt")) as file:
     # If there is a /backup dir found on the server, add it to the template and then combine templates
     if search("backup", root_dirs):
         handle_if_backups = handle_if_backups.replace("[backup_dirs]", backup_dirs)
+        handle_if_backups = handle_if_backups.replace("[backup_conf]", backup_conf)
         complete_template = complete_template.replace("[handle_if_backups]", handle_if_backups)
     else:
         complete_template = complete_template.replace("[handle_if_backups]", "")
