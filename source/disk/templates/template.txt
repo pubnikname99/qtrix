@@ -1,0 +1,37 @@
+Hello,
+
+Thank you for contacting the FastComet Tech Support Team.
+
+I have reviewed the issue and the same is caused due to the fact that your server has run out of space as you can verify from the output below:
+
+[df_info]
+
+I have reviewed the disk usage of the server and directories are allocating most of the disk space:
+
+[root_dirs]
+
+The home directory contains the files of websites and the cPanel account structure. The ‘var’ directory contains the mail server software and the databases. The ‘usr’ directory contains all of the server software files. [handle_if_backups]
+
+[if_files_found]
+
+In order to permanently resolve the issue I would suggest one of the following:
+
+1. Review your server and remove any unnecessary files from the same in order to free up disk space.
+
+[upgrade_recommend] [jb_template]
+
+Please consider the information above and update us via this ticket with more information on how you wish to proceed regarding this matter.
+
+We will be waiting for your update on the matter.
+
+We are here to support you 24/7
+
+Kind Regards,
+
+[admin_name]
+Technical Support Team
+--
+Website: https://www.fastcomet.com/
+Facebook: https://www.facebook.com/fastcometcloud/
+Twitter: https://twitter.com/fastcometcloud/
+Leave a Review for me: https://www.trustpilot.com/review/www.fastcomet.com

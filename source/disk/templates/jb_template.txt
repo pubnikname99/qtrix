@@ -1,0 +1,3 @@
+
+
+3. Consider the “VPS Offsite Cloud Backup” add-on service, which provides you with up to 10 independent daily snapshots of your Cloud Server accounts including files, databases, and emails on secure remote cloud storage, which can be restored via the 1-click cPanel restore manager. The add-on service costs $19.95 USD on a monthly basis and could be purchased via the Client Area -> Order -> Product Addons.

@@ -1,0 +1,11 @@
+2. You can consider upgrading your hosting package to one with more free disk space. You will have to submit an order via your Client Area -> Products -> My Products -> View Details and click on Upgrade. Nothing else is required from your end afterward. However, please note that the upgrade will result in a downtime of around 30-60 minutes, as we need to power your server off, in order to add the new resources. Your current disk space is:
+
+> [current_space]
+
+And the next upgradable hosting package has the following total disk space:
+
+> [upgrade_server]
+
+Of course, the upgrade can be scheduled at a convenient for you time.
+
+If you have difficulties submitting the upgrade, you can always reach one of our Sales Representatives via the Live Chat on our website, and they will assist you with the upgrade procedure.

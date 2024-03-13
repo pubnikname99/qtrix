@@ -1,0 +1,7 @@
+I have further reviewed the disk usage of your server and found the following files that are taking up more than 200 MB of space on the server:
+
+[large_files_found]
+
+We would gladly remove the above-mentioned files and free up some space on the server in order to return the proper functionality of the same. However, in order to be able to do so, we will need your confirmation regarding this matter.
+
+With that in mind, please review the provided list of files and update us via this ticket with the ones that we should remove from your server.

@@ -1,0 +1,13 @@
+The backup folder contains a backup of the whole cPanel account. The current backups in the /backup directory are as follows:
+
+[backup_dirs]
+
+Due to the way that incremental backups work, they're linked to each other and deleting a backup might not have any effect on the disk usage. You can read more about incremental-type backups on the page below:
+
+> https://docs.cpanel.net/whm/backup/backup-configuration/
+
+The current backup configuration is as follows:
+
+SCREENSHOT_FOR_CPAN_BACKUPS
+
+We can offer to reconfigure the backing up service to ONLY retain weekly OR daily backups and to reconfigure the retention to 1. We can also offer to reconfigure the backup types FROM incremental TO compressed.

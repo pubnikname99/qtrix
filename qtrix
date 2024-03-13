@@ -60,7 +60,7 @@ else
 fi
 
 # The array that holds the binaries that are used by the script:
-binary_array=("df" "du" "sar" "nproc" "awk" "systemctl")
+binary_array=("df" "du" "sar" "nproc" "awk" "systemctl" "wc" "sort" "uniq" "head" "tail" "find" "python")
 
 # Loop through each binary and check if present:
 printf "\nEach binary dependancy of this script will be checked below:\n"
@@ -93,10 +93,10 @@ ${L_BLUE}- Sar output filtered to show if 1min CPU load was higher than number o
 incident time  runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked
 $(sar -q | awk -v num_cores="$num_cores" '{if($5>num_cores)print}' | grep -v "ldavg\|blocked\|${os_info[1]}")
 
-- Sar output the last five entries of CPU usage in any case:
+${L_BLUE}- Sar output the last five entries of CPU usage in any case:${ENDCOLOR}
 $(sar -q | tail -5)
 "
-echo -e "${YELLOW}--- DETECTED INSTALLED SERVICES ---${ENDCOLOR}"
+echo -e "${YELLOW}--- DETECTED INSTALLED SERVICES ---${ENDCOLOR}\n"
 services_to_check=("httpd" "lsws" "nginx" "mariadb" "mysqld" "postgresql" "nightwatchd" "jetmongod" "csf" "cphulkd" "imunify360" "redis" "memcached" "supervisord" "munin" "elasticsearch")
 
 # The below loop will check each service if the same is active:
@@ -145,20 +145,26 @@ do
         esac
 done
 
+# Perform specific actions on the server:
+echo -e "\n${YELLOW}--- PERFORM AUTOMATED ACTIONS ON SERVER ---${ENDCOLOR}"
 keep_loop=true
 until [[ $keep_loop == false ]]
 do
         # Select from a list of actions if you want to perform a specific task:
-        read -rp "\nYou can perform specific actions here after reviewing the output above. Please select from the following (type the number at the start of the option):
+        read -rp "-- You can perform specific actions here after reviewing the output above. Please select from the following (type the number at the start of the option):
+
 1) Disk space breakdown -- TEMPLATE
 2) Exit
-" user_input
-        
+
+Your choice: " user_input
+        case "$user_input" in
+                1) read -rp "-- Please input the name that will appear on the ticket itself below (eg: Nick): " admin_name
+        esac
         # Perform the action selected above:
-        case "$active_service" in
-                1) . "$DIR/source/disk/disk.sh" && keep_loop=false ;;
+        case "$user_input" in
+                1) echo -e "\n${L_BLUE}Gathering info and creating template, please wait. . .${ENDCOLOR}\n"
+                . "$DIR/source/disk/disk.sh" && keep_loop=false ;;
                 2) exit ;;
-                *) echo "Invalid input. Please try again."
+                *) echo -e "\n${RED}Invalid input. Please try again.${ENDCOLOR}\n"
         esac
 done
-
