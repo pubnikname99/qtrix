@@ -1,5 +1,11 @@
 #! /bin/bash
 
+
+### !!!! CHANGES TO BE:
+# self cleanup
+# offer python3 install for centos7
+# some malware checks
+
 # This is a diagnostics script that for now provides some basic information
 # about the machine that it is used on. It supports a limited number of OSes
 # intentionally.
@@ -34,21 +40,20 @@ else
 fi
 
 # Show welcome message and output basic OS info:
-echo -e "${YELLOW}Welcome to the script!${ENDCOLOR}
+echo -e "\n${YELLOW}Welcome to the script!${ENDCOLOR}
 
 Current OS is: $os_name
 Kernel version is: ${os_info[-1]}"
 
 ## Perform OS compatibility check with approved OSes:
 # Compatible OSes array
-supported_oses=("CloudLinux 8" "Fedora Linux 38" "CentOS Linux 7" "AlmaLinux 8")
+supported_oses=("CloudLinux 8" "Fedora Linux 38" "CentOS Linux 7" "AlmaLinux 8" "AlmaLinux 9" "CloudLinux 7" "CloudLinux 8" "CloudLinux 9")
 
 # The actual code that checks the compatibility:
 if [[ "${supported_oses[*]}" =~ ${os_name/ (*} ]] || [[ "${supported_oses[*]}" =~ ${os_name/.? (*} ]]
 then
         printf "%s\n${GREEN}The OS is supported by the script, continuing.${ENDCOLOR}\n"
 else
-        echo "Bye"
         read -rp "The script does not support the current OS, please confirm with yes/y if you'd like to continue: " user_input
         if [[ "$user_input" == "yes" || "$user_input" == "y" ]]
         then
@@ -60,7 +65,7 @@ else
 fi
 
 # The array that holds the binaries that are used by the script:
-binary_array=("df" "du" "sar" "nproc" "awk" "systemctl" "wc" "sort" "uniq" "head" "tail" "find" "python3")
+binary_array=("df" "du" "sar" "nproc" "awk" "systemctl" "wc" "sort" "uniq" "head" "tail" "find" "python3" "mysqladmin")
 
 # Loop through each binary and check if present:
 printf "\nEach binary dependancy of this script will be checked below:\n"
@@ -86,7 +91,7 @@ $(df -ih / /tmp)
 
 ${YELLOW}--- MEMORY RELATED ---${ENDCOLOR}
 ${L_BLUE}- If there are OOM-related kernel messages, they will appear below (latest 10 shown, there could be more):${ENDCOLOR}
-$(grep 'Out of' /var/log/messages* | tail -10)
+$(grep -a 'Out of' /var/log/messages | tail -10)
 
 ${YELLOW}--- CPU RELATED ---${ENDCOLOR}
 ${L_BLUE}- Sar output filtered to show if 1min CPU load was higher than number of cores (there could be none):${ENDCOLOR}
@@ -142,6 +147,7 @@ for active_service in "${working_services[@]}"
 do
         case "$active_service" in
                 "httpd") . "$DIR/source/ws/httpd-ws.sh" ;;
+                "mysqld") . "$DIR/source/database/mysql-db.sh" ;;
         esac
 done
 
@@ -154,7 +160,7 @@ do
         read -rp "-- You can perform specific actions here after reviewing the output above. Please select from the following (type the number at the start of the option):
 
 1) Disk space breakdown -- TEMPLATE
-2) Exit
+0) Exit
 
 Your choice: " user_input
         case "$user_input" in
@@ -164,7 +170,7 @@ Your choice: " user_input
         case "$user_input" in
                 1) echo -e "\n${L_BLUE}Gathering info and creating template, please wait . . .${ENDCOLOR}\n"
                 . "$DIR/source/disk/disk.sh" && keep_loop=false ;;
-                2) exit ;;
+                0) exit ;;
                 *) echo -e "\n${RED}Invalid input. Please try again.${ENDCOLOR}\n"
         esac
 done
